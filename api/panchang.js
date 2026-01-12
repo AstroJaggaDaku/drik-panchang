@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   try {
-    /* 🔐 CORS FIX — this is what was missing */
+    /* 🌐 CORS for Odoo, WordPress, iframe, etc */
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -9,16 +9,22 @@ export default async function handler(req, res) {
       return res.status(200).end();
     }
 
-    const lat = req.query.lat || "22.57";
-    const lon = req.query.lon || "88.36";
-    const tz  = req.query.tz  || "Asia/Kolkata";
+    /* Input */
+    const lat  = req.query.lat  || "22.57";
+    const lon  = req.query.lon  || "88.36";
+    const tz   = req.query.tz   || "Asia/Kolkata";
+    const date = req.query.date || "";     // 🔥 NEW (YYYY-MM-DD)
 
     const BASE = "https://panchang-python.onrender.com/panchang";
 
-    const url = `${BASE}?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&tz=${encodeURIComponent(tz)}`;
+    /* Build Swiss engine URL */
+    const url = date
+      ? `${BASE}?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&tz=${encodeURIComponent(tz)}&date=${encodeURIComponent(date)}`
+      : `${BASE}?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&tz=${encodeURIComponent(tz)}`;
 
+    /* Timeout protection */
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 9000);
+    const timeout = setTimeout(() => controller.abort(), 10000);
 
     const response = await fetch(url, { signal: controller.signal });
     clearTimeout(timeout);
@@ -29,7 +35,7 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    /* CDN caching for Vercel */
+    /* Vercel CDN cache */
     res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate");
     res.setHeader("Content-Type", "application/json");
 
@@ -38,6 +44,7 @@ export default async function handler(req, res) {
       engine: "Swiss Ephemeris + Lahiri (Drik Panchang)",
       timezone: tz,
       location: { lat, lon },
+      date: date || new Date().toISOString().slice(0,10),
       generated_at: new Date().toISOString(),
       panchang: data
     });
