@@ -1,0 +1,7 @@
+{
+  "name": "jd-panchang-vercel",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "51Kalibari Swiss Ephemeris Panchang Gateway",
+  "license": "MIT"
+}
