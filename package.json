@@ -1,7 +1,6 @@
 {
   "name": "jd-swiss-panchang",
-  "version": "2.0.0",
-  "description": "51Kalibari Swiss Ephemeris Panchang API – Drik Panchang Standard",
+  "version": "2.1.0",
   "type": "module",
   "scripts": {
     "start": "node server.js"
@@ -9,7 +8,7 @@
   "dependencies": {
     "express": "^4.19.2",
     "cors": "^2.8.5",
-    "@astronexus/swisseph": "^1.2.0",
+    "swisseph": "^0.6.1",
     "luxon": "^3.4.4",
     "node-cache": "^5.1.2"
   }
