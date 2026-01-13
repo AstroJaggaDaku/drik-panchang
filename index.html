@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <title>51Kalibari Swiss Panchang</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
 body{
   margin:0;
@@ -12,38 +13,57 @@ body{
   color:#f6f7fb;
 }
 .container{
-  max-width:1100px;
+  max-width:1150px;
   margin:40px auto;
   padding:20px;
 }
 .card{
   background:linear-gradient(160deg,#141a35,#1e2650);
   border-radius:22px;
-  padding:28px;
-  box-shadow:0 0 40px rgba(0,0,0,.6);
+  padding:30px;
+  box-shadow:0 0 60px rgba(0,0,0,.7);
 }
-h1{
+.header{
+  text-align:center;
+  margin-bottom:25px;
+}
+.header h1{
   color:#ffd580;
-  margin:0 0 20px;
-  font-size:28px;
+  margin:0;
+  font-size:30px;
+}
+.sub{
+  font-size:14px;
+  color:#aab0ff;
+  margin-top:6px;
 }
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:20px;
+  gap:18px;
 }
 .block{
   background:#0d1228;
   border-radius:16px;
   padding:18px;
+  box-shadow:0 6px 16px rgba(0,0,0,.4);
 }
-.label{color:#aab0ff;font-size:13px}
-.value{font-size:18px;font-weight:600;margin-top:4px;color:#fff}
-.footer{
-  margin-top:25px;
-  text-align:center;
-  color:#888;
+.label{
+  color:#aab0ff;
   font-size:13px;
+}
+.value{
+  font-size:18px;
+  font-weight:600;
+  margin-top:6px;
+  color:#fff;
+}
+.footer{
+  margin-top:30px;
+  text-align:center;
+  color:#999;
+  font-size:13px;
+  line-height:1.6;
 }
 </style>
 </head>
@@ -51,17 +71,40 @@ h1{
 <body>
 <div class="container">
   <div class="card">
-    <h1>🪐 51Kalibari Swiss Panchang</h1>
+    <div class="header">
+      <h1>🔮 51Kalibari Swiss Panchang</h1>
+      <div id="vedicDate" class="sub"></div>
+    </div>
+
     <div id="grid" class="grid"></div>
-    <div class="footer">Powered by Swiss Ephemeris • Lahiri • Astrologer Joydev Sastri</div>
+
+    <div class="footer">
+      © 51Kalibari.com • Panchang Engine by Swiss Ephemeris (Lahiri)<br>
+      Curated by <b>Astrologer Joydev Sastri</b>
+    </div>
   </div>
 </div>
 
 <script>
 fetch("/api/panchang")
-.then(r=>r.json())
-.then(d=>{
-  const p = d.panchang;
+.then(r => r.json())
+.then(data => {
+
+  const p = data.panchang;
+
+  /* 🔥 AstroSage-style Civil Date Resolver */
+  const today = new Date();
+  const apiDate = new Date(p.date);
+
+  if (apiDate.getDate() !== today.getDate()) {
+    p.date = today.toISOString().slice(0,10);
+  }
+
+  document.getElementById("vedicDate").innerHTML =
+    "📅 " + today.toLocaleDateString("en-IN",{
+      weekday:"long",day:"numeric",month:"long",year:"numeric"
+    }) + " • Vedic Panchang";
+
   const g = document.getElementById("grid");
 
   function box(label,val){
@@ -77,6 +120,7 @@ fetch("/api/panchang")
     ${box("Nakshatra",p.lunar.nakshatra)}
     ${box("Nakshatra Ends",p.lunar.nakshatra_end)}
     ${box("Yoga",p.lunar.yoga)}
+    ${box("Yoga Ends",p.lunar.yoga_end)}
     ${box("Karana",p.lunar.karana)}
     ${box("Paksha",p.lunar.paksha)}
 
