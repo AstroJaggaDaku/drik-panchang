@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>51 Kalibari Panchang</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:"Noto Sans Bengali",system-ui;
+  background:radial-gradient(circle at top,#1b2142,#05060d 70%);
+  color:#fff;
+}
+
+.wrapper{
+  max-width:1200px;
+  margin:auto;
+  padding:30px;
+}
+
+.header{
+  text-align:center;
+  margin-bottom:25px;
+}
+.header h1{
+  margin:0;
+  color:#ffd36b;
+  font-size:32px;
+}
+.header p{
+  color:#ccc;
+}
+
+.card{
+  background:linear-gradient(160deg,#141a3a,#090b1e);
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 30px 70px rgba(0,0,0,.85);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:18px;
+}
+
+.item{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  padding:16px 18px;
+}
+
+.label{
+  font-size:13px;
+  color:#ffd36b;
+}
+.value{
+  font-size:18px;
+  font-weight:600;
+  margin-top:6px;
+}
+
+.footer{
+  text-align:center;
+  margin-top:35px;
+  color:#aaa;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <h1>🌙 51 Kalibari Panchang</h1>
+    <p>Swiss Ephemeris • AstroSage-Grade Accuracy</p>
+  </div>
+
+  <div class="card">
+    <div id="loading">🔮 Calculating today’s Panchang…</div>
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <div class="footer">
+    © Astrologer Joydev Sastri • 51 Kalibari • Powered by Swiss Ephemeris
+  </div>
+
+</div>
+
+<script>
+const API="/api/panchang";
+
+fetch(API)
+.then(r=>r.json())
+.then(res=>{
+  const d = res.panchang;
+  document.getElementById("loading").style.display="none";
+
+  const box=(l,v)=>`
+    <div class="item">
+      <div class="label">${l}</div>
+      <div class="value">${v || "—"}</div>
+    </div>`;
+
+  document.getElementById("grid").innerHTML =
+      box("Date",res.date)
+    + box("Day",d.day)
+    + box("Tithi",`${d.tithi} till ${d.tithi_end}`)
+    + box("Nakshatra",`${d.nakshatra} till ${d.nakshatra_end}`)
+    + box("Yoga",`${d.yoga} till ${d.yoga_end}`)
+    + box("Karana",d.karana)
+    + box("Paksha",d.paksha)
+    + box("Moon Sign",d.moon_sign)
+    + box("Sunrise",d.sunrise)
+    + box("Sunset",d.sunset)
+    + box("Moonrise",d.moonrise)
+    + box("Moonset",d.moonset)
+    + box("Rahu Kalam",d.rahu_kalam)
+    + box("Yamaganda",d.yamaganda)
+    + box("Gulika",d.gulika)
+    + box("Abhijit",d.abhijit)
+    + box("Amanta Month",d.amanta_month)
+    + box("Purnimanta Month",d.purnimanta_month)
+    + box("Ritu",d.ritu)
+    + box("Vikram Samvat",d.vikram_samvat)
+    + box("Shaka Samvat",d.shaka_samvat)
+    + box("Kali Samvat",d.kali_samvat);
+});
+</script>
+
+</body>
+</html>
