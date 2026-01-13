@@ -1,75 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>51 Kalibari Panchang</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<title>51Kalibari Swiss Panchang</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 body{
- margin:0;
- font-family:"Noto Sans Bengali",system-ui;
- background:radial-gradient(circle at top,#1a1f3a,#05060d);
- color:#fff;
+  margin:0;
+  font-family:Inter,system-ui;
+  background:radial-gradient(circle at top,#1c2440,#06070d 80%);
+  color:#f6f7fb;
 }
-.wrap{max-width:1100px;margin:auto;padding:30px}
+.container{
+  max-width:1100px;
+  margin:40px auto;
+  padding:20px;
+}
 .card{
- background:linear-gradient(160deg,#131a3c,#080a1a);
- border-radius:24px;
- padding:28px;
- box-shadow:0 25px 60px rgba(0,0,0,.8);
+  background:linear-gradient(160deg,#141a35,#1e2650);
+  border-radius:22px;
+  padding:28px;
+  box-shadow:0 0 40px rgba(0,0,0,.6);
 }
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-.box{
- background:rgba(255,255,255,.04);
- border:1px solid rgba(255,255,255,.08);
- border-radius:14px;
- padding:14px 16px;
+h1{
+  color:#ffd580;
+  margin:0 0 20px;
+  font-size:28px;
 }
-.lab{font-size:13px;color:#ffd36b}
-.val{font-size:18px;font-weight:600;margin-top:6px}
-h1{text-align:center;color:#ffd36b;margin-bottom:10px}
-.sub{text-align:center;color:#aaa;margin-bottom:25px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+.block{
+  background:#0d1228;
+  border-radius:16px;
+  padding:18px;
+}
+.label{color:#aab0ff;font-size:13px}
+.value{font-size:18px;font-weight:600;margin-top:4px;color:#fff}
+.footer{
+  margin-top:25px;
+  text-align:center;
+  color:#888;
+  font-size:13px;
+}
 </style>
 </head>
-<body>
-<div class="wrap">
-<h1>🌙 51 Kalibari Panchang</h1>
-<div class="sub">Powered by Swiss Ephemeris • Astrologer Joydev Sastri</div>
 
-<div class="card">
-<div id="loading">🔮 Panchang loading…</div>
-<div id="grid" class="grid"></div>
-</div>
+<body>
+<div class="container">
+  <div class="card">
+    <h1>🪐 51Kalibari Swiss Panchang</h1>
+    <div id="grid" class="grid"></div>
+    <div class="footer">Powered by Swiss Ephemeris • Lahiri • Astrologer Joydev Sastri</div>
+  </div>
 </div>
 
 <script>
 fetch("/api/panchang")
 .then(r=>r.json())
-.then(res=>{
- const d=res.panchang;
- document.getElementById("loading").style.display="none";
- const box=(l,v)=>`<div class="box"><div class="lab">${l}</div><div class="val">${v||"—"}</div></div>`;
- document.getElementById("grid").innerHTML=
-  box("Date",res.date)+
-  box("Day",d.day)+
-  box("Tithi",d.tithi+" till "+d.tithi_end)+
-  box("Nakshatra",d.nakshatra+" till "+d.nakshatra_end)+
-  box("Yoga",d.yoga+" till "+d.yoga_end)+
-  box("Karana",d.karana)+
-  box("Paksha",d.paksha)+
-  box("Moon Sign",d.moon_sign)+
-  box("Sunrise",d.sunrise)+
-  box("Sunset",d.sunset)+
-  box("Moonrise",d.moonrise)+
-  box("Moonset",d.moonset)+
-  box("Rahu Kalam",d.rahu_kalam)+
-  box("Yamaganda",d.yamaganda)+
-  box("Gulika",d.gulika)+
-  box("Abhijit",d.abhijit)+
-  box("Amanta Month",d.amanta_month)+
-  box("Purnimanta Month",d.purnimanta_month)+
-  box("Ritu",d.ritu);
+.then(d=>{
+  const p = d.panchang;
+  const g = document.getElementById("grid");
+
+  function box(label,val){
+    return `<div class="block">
+      <div class="label">${label}</div>
+      <div class="value">${val}</div>
+    </div>`;
+  }
+
+  g.innerHTML = `
+    ${box("Tithi",p.lunar.tithi)}
+    ${box("Tithi Ends",p.lunar.tithi_end)}
+    ${box("Nakshatra",p.lunar.nakshatra)}
+    ${box("Nakshatra Ends",p.lunar.nakshatra_end)}
+    ${box("Yoga",p.lunar.yoga)}
+    ${box("Karana",p.lunar.karana)}
+    ${box("Paksha",p.lunar.paksha)}
+
+    ${box("Sunrise",p.sun.sunrise)}
+    ${box("Sunset",p.sun.sunset)}
+    ${box("Moon Sign",p.moon.sign)}
+    ${box("Moonrise",p.moon.moonrise || "—")}
+    ${box("Moonset",p.moon.moonset || "—")}
+
+    ${box("Amanta Month",p.calendar.amanta_month)}
+    ${box("Purnimanta Month",p.calendar.purnimanta_month)}
+    ${box("Ritu",p.calendar.ritu)}
+
+    ${box("Rahu Kalam",p.muhurta.rahu_kalam)}
+    ${box("Yamaganda",p.muhurta.yamaganda)}
+    ${box("Gulika",p.muhurta.gulika)}
+    ${box("Abhijit",p.muhurta.abhijit)}
+  `;
 });
 </script>
 </body>
