@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8"/>
+<meta charset="UTF-8">
 <title>51Kalibari Swiss Panchang</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
@@ -12,133 +12,128 @@ body{
   background:radial-gradient(circle at top,#1c2440,#06070d 80%);
   color:#f6f7fb;
 }
-.container{
-  max-width:1150px;
-  margin:40px auto;
-  padding:20px;
-}
+.container{max-width:1200px;margin:40px auto;padding:20px}
 .card{
   background:linear-gradient(160deg,#141a35,#1e2650);
-  border-radius:22px;
+  border-radius:24px;
   padding:30px;
-  box-shadow:0 0 60px rgba(0,0,0,.7);
+  box-shadow:0 0 70px rgba(0,0,0,.7);
 }
-.header{
-  text-align:center;
-  margin-bottom:25px;
-}
-.header h1{
-  color:#ffd580;
-  margin:0;
-  font-size:30px;
-}
-.sub{
-  font-size:14px;
-  color:#aab0ff;
-  margin-top:6px;
-}
+.header{text-align:center;margin-bottom:30px}
+.header h1{color:#ffd580;margin:0;font-size:30px}
+.sub{color:#aab0ff;font-size:14px;margin-top:6px}
+
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:18px;
 }
+
 .block{
   background:#0d1228;
   border-radius:16px;
   padding:18px;
-  box-shadow:0 6px 16px rgba(0,0,0,.4);
 }
-.label{
-  color:#aab0ff;
-  font-size:13px;
-}
-.value{
+.label{color:#aab0ff;font-size:13px}
+.value{font-size:18px;font-weight:600;margin-top:6px}
+
+.section-title{
+  margin-top:30px;
+  margin-bottom:10px;
+  color:#ffd580;
+  font-weight:700;
   font-size:18px;
-  font-weight:600;
-  margin-top:6px;
-  color:#fff;
 }
+
+.hora-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:10px;
+}
+.hora-box{
+  background:#0d1228;
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
+}
+
 .footer{
   margin-top:30px;
   text-align:center;
-  color:#999;
   font-size:13px;
-  line-height:1.6;
+  color:#999;
 }
 </style>
 </head>
 
 <body>
 <div class="container">
-  <div class="card">
-    <div class="header">
-      <h1>🔮 51Kalibari Swiss Panchang</h1>
-      <div id="vedicDate" class="sub"></div>
-    </div>
+<div class="card">
 
-    <div id="grid" class="grid"></div>
+<div class="header">
+<h1>🔮 51Kalibari Swiss Panchang</h1>
+<div id="todayDate" class="sub"></div>
+<div class="sub">Swiss Ephemeris • Lahiri • Astrologer Joydev Sastri</div>
+</div>
 
-    <div class="footer">
-      © 51Kalibari.com • Panchang Engine by Swiss Ephemeris (Lahiri)<br>
-      Curated by <b>Astrologer Joydev Sastri</b>
-    </div>
-  </div>
+<div id="mainGrid" class="grid"></div>
+
+<div class="section-title">⏰ Hora (Planetary Hours)</div>
+<div id="horaGrid" class="hora-grid"></div>
+
+<div class="footer">
+© 51Kalibari.com — Powered by Swiss Ephemeris  
+</div>
+
+</div>
 </div>
 
 <script>
 fetch("/api/panchang")
-.then(r => r.json())
-.then(data => {
+.then(r=>r.json())
+.then(d=>{
 
-  const p = data.panchang;
+  const p = d.panchang;
 
-  /* 🔥 AstroSage-style Civil Date Resolver */
+  /* 🔥 Force today’s civil date */
   const today = new Date();
-  const apiDate = new Date(p.date);
+  document.getElementById("todayDate").innerHTML =
+    today.toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 
-  if (apiDate.getDate() !== today.getDate()) {
-    p.date = today.toISOString().slice(0,10);
+  function box(l,v){
+    return `<div class="block"><div class="label">${l}</div><div class="value">${v}</div></div>`;
   }
 
-  document.getElementById("vedicDate").innerHTML =
-    "📅 " + today.toLocaleDateString("en-IN",{
-      weekday:"long",day:"numeric",month:"long",year:"numeric"
-    }) + " • Vedic Panchang";
-
-  const g = document.getElementById("grid");
-
-  function box(label,val){
-    return `<div class="block">
-      <div class="label">${label}</div>
-      <div class="value">${val}</div>
-    </div>`;
-  }
-
-  g.innerHTML = `
-    ${box("Tithi",p.lunar.tithi)}
-    ${box("Tithi Ends",p.lunar.tithi_end)}
-    ${box("Nakshatra",p.lunar.nakshatra)}
-    ${box("Nakshatra Ends",p.lunar.nakshatra_end)}
-    ${box("Yoga",p.lunar.yoga)}
-    ${box("Yoga Ends",p.lunar.yoga_end)}
-    ${box("Karana",p.lunar.karana)}
-    ${box("Paksha",p.lunar.paksha)}
-
-    ${box("Sunrise",p.sun.sunrise)}
-    ${box("Sunset",p.sun.sunset)}
-    ${box("Moon Sign",p.moon.sign)}
-    ${box("Moonrise",p.moon.moonrise || "—")}
-    ${box("Moonset",p.moon.moonset || "—")}
-
-    ${box("Amanta Month",p.calendar.amanta_month)}
-    ${box("Purnimanta Month",p.calendar.purnimanta_month)}
-    ${box("Ritu",p.calendar.ritu)}
-
-    ${box("Rahu Kalam",p.muhurta.rahu_kalam)}
-    ${box("Yamaganda",p.muhurta.yamaganda)}
-    ${box("Gulika",p.muhurta.gulika)}
-    ${box("Abhijit",p.muhurta.abhijit)}
+  document.getElementById("mainGrid").innerHTML = `
+    ${box("Tithi", p.tithi)}
+    ${box("Tithi Ends", p.tithi_end)}
+    ${box("Nakshatra", p.nakshatra)}
+    ${box("Nakshatra Ends", p.nakshatra_end)}
+    ${box("Yoga", p.yoga)}
+    ${box("Yoga Ends", p.yoga_end)}
+    ${box("Karana", p.karana)}
+    ${box("Paksha", p.paksha)}
+    ${box("Moon Sign", p.moon_sign)}
+    ${box("Sunrise", p.sunrise)}
+    ${box("Sunset", p.sunset)}
+    ${box("Moonrise", p.moonrise || "—")}
+    ${box("Moonset", p.moonset || "—")}
+    ${box("Amanta Month", p.amanta_month)}
+    ${box("Purnimanta Month", p.purnimanta_month)}
+    ${box("Ritu", p.ritu)}
+    ${box("Festival", p.festival || "None")}
+    ${box("Varjyam", p.varjyam === "Yes" ? "❌ Inauspicious" : "✅ Auspicious")}
+    ${box("Abhijit", p.abhijit)}
+    ${box("Rahu Kalam", p.rahu_kalam)}
+    ${box("Yamaganda", p.yamaganda)}
+    ${box("Gulika", p.gulika)}
   `;
+
+  /* Hora */
+  const h = p.hora || [];
+  document.getElementById("horaGrid").innerHTML =
+    h.map(x=>`<div class="hora-box"><b>${x.lord}</b><br>${x.from} – ${x.to}</div>`).join("");
+
 });
 </script>
 </body>
