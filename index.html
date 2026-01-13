@@ -28,7 +28,6 @@ body{
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:18px;
 }
-
 .block{
   background:#0d1228;
   border-radius:16px;
@@ -44,7 +43,6 @@ body{
   font-weight:700;
   font-size:18px;
 }
-
 .hora-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
@@ -82,59 +80,60 @@ body{
 <div id="horaGrid" class="hora-grid"></div>
 
 <div class="footer">
-© 51Kalibari.com — Powered by Swiss Ephemeris  
+© 51Kalibari.com — Powered by Swiss Ephemeris
 </div>
 
 </div>
 </div>
 
 <script>
-fetch("/api/panchang")
+const API="https://panchang-python.onrender.com/panchang";
+
+fetch(API)
 .then(r=>r.json())
-.then(d=>{
+.then(p=>{
 
-  const p = d.panchang;
-
-  /* 🔥 Force today’s civil date */
-  const today = new Date();
+  /* Force today date for display */
+  const today=new Date();
   document.getElementById("todayDate").innerHTML =
     today.toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 
   function box(l,v){
-    return `<div class="block"><div class="label">${l}</div><div class="value">${v}</div></div>`;
+    return `<div class="block"><div class="label">${l}</div><div class="value">${v||"—"}</div></div>`;
   }
 
-  document.getElementById("mainGrid").innerHTML = `
-    ${box("Tithi", p.tithi)}
-    ${box("Tithi Ends", p.tithi_end)}
-    ${box("Nakshatra", p.nakshatra)}
-    ${box("Nakshatra Ends", p.nakshatra_end)}
-    ${box("Yoga", p.yoga)}
-    ${box("Yoga Ends", p.yoga_end)}
-    ${box("Karana", p.karana)}
-    ${box("Paksha", p.paksha)}
-    ${box("Moon Sign", p.moon_sign)}
-    ${box("Sunrise", p.sunrise)}
-    ${box("Sunset", p.sunset)}
-    ${box("Moonrise", p.moonrise || "—")}
-    ${box("Moonset", p.moonset || "—")}
-    ${box("Amanta Month", p.amanta_month)}
-    ${box("Purnimanta Month", p.purnimanta_month)}
-    ${box("Ritu", p.ritu)}
-    ${box("Festival", p.festival || "None")}
-    ${box("Varjyam", p.varjyam === "Yes" ? "❌ Inauspicious" : "✅ Auspicious")}
-    ${box("Abhijit", p.abhijit)}
-    ${box("Rahu Kalam", p.rahu_kalam)}
-    ${box("Yamaganda", p.yamaganda)}
-    ${box("Gulika", p.gulika)}
+  document.getElementById("mainGrid").innerHTML=`
+    ${box("Tithi",p.tithi)}
+    ${box("Tithi Ends",p.tithi_end)}
+    ${box("Nakshatra",p.nakshatra)}
+    ${box("Nakshatra Ends",p.nakshatra_end)}
+    ${box("Yoga",p.yoga)}
+    ${box("Yoga Ends",p.yoga_end)}
+    ${box("Karana",p.karana)}
+    ${box("Paksha",p.paksha)}
+    ${box("Moon Sign",p.moon_sign)}
+    ${box("Sunrise",p.sunrise)}
+    ${box("Sunset",p.sunset)}
+    ${box("Moonrise",p.moonrise)}
+    ${box("Moonset",p.moonset)}
+    ${box("Amanta Month",p.amanta_month)}
+    ${box("Purnimanta Month",p.purnimanta_month)}
+    ${box("Ritu",p.ritu)}
+    ${box("Festival",p.festival)}
+    ${box("Varjyam",p.varjyam==="Yes"?"❌ Inauspicious":"✅ Auspicious")}
+    ${box("Abhijit",p.abhijit)}
+    ${box("Rahu Kalam",p.rahu_kalam)}
+    ${box("Yamaganda",p.yamaganda)}
+    ${box("Gulika",p.gulika)}
   `;
 
   /* Hora */
-  const h = p.hora || [];
-  document.getElementById("horaGrid").innerHTML =
+  const h=p.hora||[];
+  document.getElementById("horaGrid").innerHTML=
     h.map(x=>`<div class="hora-box"><b>${x.lord}</b><br>${x.from} – ${x.to}</div>`).join("");
 
 });
 </script>
+
 </body>
 </html>
